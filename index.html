@@ -29,7 +29,6 @@
         text-align: center;
         width: 90%;
         max-width: 600px;
-        transform: perspective(800px) rotateX(0deg);
         animation: float 4s ease-in-out infinite;
     }
 
@@ -90,7 +89,6 @@
         box-shadow: 0 0 40px #00ffff, 0 0 60px #ff00ff;
     }
 
-    /* Confetti */
     .confetti {
         position: fixed;
         width: 10px;
@@ -99,11 +97,91 @@
         top: -10px;
         animation: fall 3s linear forwards;
         opacity: 0.8;
+        pointer-events: none;
     }
 
     @keyframes fall {
         0% { transform: translateY(0) rotate(0deg); }
         100% { transform: translateY(120vh) rotate(720deg); }
+    }
+
+    /* Full-screen editor */
+    .editor-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.9);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+        padding: 20px;
+    }
+
+    .editor-box {
+        width: 100%;
+        max-width: 700px;
+        background: rgba(10,10,30,0.95);
+        border-radius: 16px;
+        border: 2px solid #00ffff;
+        box-shadow: 0 0 30px #00ffff;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .editor-title {
+        font-size: 1.6rem;
+        margin-bottom: 5px;
+        text-align: center;
+    }
+
+    .editor-hint {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .editor-textarea {
+        width: 100%;
+        min-height: 220px;
+        resize: vertical;
+        border-radius: 10px;
+        border: 1px solid #00ffff;
+        background: rgba(0,0,0,0.8);
+        color: #fff;
+        padding: 10px;
+        font-size: 0.95rem;
+        font-family: monospace;
+    }
+
+    .editor-buttons {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .editor-btn {
+        flex: 1;
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+
+    .editor-save {
+        background: linear-gradient(45deg, #00ff88, #00ffff);
+        color: #000;
+    }
+
+    .editor-cancel {
+        background: rgba(255,255,255,0.1);
+        color: #fff;
     }
 </style>
 </head>
@@ -115,11 +193,24 @@
 
     <div id="challengeBox" class="box">Press ROLL to start!</div>
 
-    <button class="btn" onclick="startRolling()">ROLL!</button>
+    <button id="rollButton" class="btn">ROLL!</button>
+</div>
+
+<!-- Full-screen editor -->
+<div id="editorOverlay" class="editor-overlay">
+    <div class="editor-box">
+        <div class="editor-title">Edit Challenges</div>
+        <div class="editor-hint">One challenge per line. Long-press ROLL (2 seconds) to open this editor.</div>
+        <textarea id="editorTextarea" class="editor-textarea"></textarea>
+        <div class="editor-buttons">
+            <button class="editor-btn editor-cancel" id="editorCancel">Cancel</button>
+            <button class="editor-btn editor-save" id="editorSave">Save</button>
+        </div>
+    </div>
 </div>
 
 <script>
-const challenges = [
+let challenges = [
     "Act like a chicken for 10 seconds",
     "Say a word starting with م",
     "Do 10 jumping jacks",
@@ -140,22 +231,40 @@ const challenges = [
 ];
 
 let rollingInterval;
+const ROLL_SPEED = 80;
+
+const rollSound = new Audio("roll.mp3");
+rollSound.loop = true;
+rollSound.volume = 0.5;
+
+const box = document.getElementById("challengeBox");
+const rollButton = document.getElementById("rollButton");
 
 function startRolling() {
-    const box = document.getElementById("challengeBox");
+    if (rollingInterval) return; // prevent double start
+
     box.classList.add("rolling");
+
+    rollSound.currentTime = 0;
+    rollSound.play();
 
     rollingInterval = setInterval(() => {
         box.textContent = challenges[Math.floor(Math.random() * challenges.length)];
-    }, 80);
+    }, ROLL_SPEED);
 
     setTimeout(stopRolling, 2000);
 }
 
 function stopRolling() {
+    if (!rollingInterval) return;
+
     clearInterval(rollingInterval);
-    const box = document.getElementById("challengeBox");
+    rollingInterval = null;
+
     box.classList.remove("rolling");
+
+    rollSound.pause();
+    rollSound.currentTime = 0;
 
     const finalChallenge = challenges[Math.floor(Math.random() * challenges.length)];
     box.textContent = finalChallenge;
@@ -180,6 +289,83 @@ function randomColor() {
     const colors = ["#ff00ff", "#00ffff", "#ffea00", "#ff5500", "#00ff55"];
     return colors[Math.floor(Math.random() * colors.length)];
 }
+
+/* Long-press logic for editor */
+let pressTimer = null;
+let longPressTriggered = false;
+
+rollButton.addEventListener("mousedown", (e) => {
+    longPressTriggered = false;
+    pressTimer = setTimeout(() => {
+        longPressTriggered = true;
+        openEditor();
+    }, 2000);
+});
+
+rollButton.addEventListener("mouseup", (e) => {
+    clearTimeout(pressTimer);
+    if (!longPressTriggered) {
+        startRolling();
+    }
+});
+
+rollButton.addEventListener("mouseleave", () => {
+    clearTimeout(pressTimer);
+});
+
+/* Touch support */
+rollButton.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    longPressTriggered = false;
+    pressTimer = setTimeout(() => {
+        longPressTriggered = true;
+        openEditor();
+    }, 2000);
+}, { passive: false });
+
+rollButton.addEventListener("touchend", (e) => {
+    clearTimeout(pressTimer);
+    if (!longPressTriggered) {
+        startRolling();
+    }
+});
+
+/* Editor logic */
+const editorOverlay = document.getElementById("editorOverlay");
+const editorTextarea = document.getElementById("editorTextarea");
+const editorSave = document.getElementById("editorSave");
+const editorCancel = document.getElementById("editorCancel");
+
+function openEditor() {
+    editorTextarea.value = challenges.join("\n");
+    editorOverlay.style.display = "flex";
+}
+
+function closeEditor() {
+    editorOverlay.style.display = "none";
+}
+
+editorSave.addEventListener("click", () => {
+    const lines = editorTextarea.value
+        .split("\n")
+        .map(l => l.trim())
+        .filter(l => l.length > 0);
+
+    if (lines.length > 0) {
+        challenges = lines;
+    }
+    closeEditor();
+});
+
+editorCancel.addEventListener("click", () => {
+    closeEditor();
+});
+
+editorOverlay.addEventListener("click", (e) => {
+    if (e.target === editorOverlay) {
+        closeEditor();
+    }
+});
 </script>
 
 </body>
