@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ultimate Challenge Machine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #000, #0a0014, #001a33);
+        background-size: 300% 300%;
+        animation: bgMove 10s infinite alternate;
+        font-family: 'Segoe UI', sans-serif;
+        overflow: hidden;
+        color: white;
+    }
+
+    @keyframes bgMove {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 100% 50%; }
+    }
+
+    .container {
+        text-align: center;
+        width: 90%;
+        max-width: 600px;
+        transform: perspective(800px) rotateX(0deg);
+        animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
+    .title {
+        font-size: 2.8rem;
+        margin-bottom: 20px;
+        text-shadow: 0 0 25px #ff00ff, 0 0 40px #00ffff;
+        font-weight: bold;
+    }
+
+    .box {
+        height: 150px;
+        background: rgba(255,255,255,0.08);
+        border: 4px solid #ff00ff;
+        border-radius: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.9rem;
+        margin-bottom: 30px;
+        overflow: hidden;
+        position: relative;
+        padding: 20px;
+        text-align: center;
+        transition: 0.3s;
+    }
+
+    .rolling {
+        animation: roll 0.15s linear infinite;
+    }
+
+    @keyframes roll {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(-25px); }
+    }
+
+    .btn {
+        padding: 18px 50px;
+        font-size: 1.7rem;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        color: white;
+        background: linear-gradient(45deg, #ff00ff, #00ffff);
+        box-shadow: 0 0 25px #ff00ff, 0 0 40px #00ffff;
+        transition: 0.2s;
+        font-weight: bold;
+    }
+
+    .btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 40px #00ffff, 0 0 60px #ff00ff;
+    }
+
+    /* Confetti */
+    .confetti {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: red;
+        top: -10px;
+        animation: fall 3s linear forwards;
+        opacity: 0.8;
+    }
+
+    @keyframes fall {
+        0% { transform: translateY(0) rotate(0deg); }
+        100% { transform: translateY(120vh) rotate(720deg); }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="title">🎉 ULTIMATE CHALLENGE MACHINE 🎉</div>
+
+    <div id="challengeBox" class="box">Press ROLL to start!</div>
+
+    <button class="btn" onclick="startRolling()">ROLL!</button>
+</div>
+
+<script>
+const challenges = [
+    "Act like a chicken for 10 seconds",
+    "Say a word starting with م",
+    "Do 10 jumping jacks",
+    "Try to make everyone laugh",
+    "Talk in slow motion for 15 seconds",
+    "Spin around 5 times and walk straight",
+    "Say the alphabet backwards",
+    "Pretend you're a robot",
+    "Do your best evil laugh",
+    "Say a random fact confidently (even if it's wrong)",
+    "Try not to laugh for 20 seconds",
+    "Make a funny face and hold it",
+    "Say 'banana' dramatically",
+    "Act like you're underwater",
+    "Dance for 7 seconds with no music",
+    "Pretend you're a superhero",
+    "Say everything in a whisper for 20 seconds"
+];
+
+let rollingInterval;
+
+function startRolling() {
+    const box = document.getElementById("challengeBox");
+    box.classList.add("rolling");
+
+    rollingInterval = setInterval(() => {
+        box.textContent = challenges[Math.floor(Math.random() * challenges.length)];
+    }, 80);
+
+    setTimeout(stopRolling, 2000);
+}
+
+function stopRolling() {
+    clearInterval(rollingInterval);
+    const box = document.getElementById("challengeBox");
+    box.classList.remove("rolling");
+
+    const finalChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+    box.textContent = finalChallenge;
+
+    launchConfetti();
+}
+
+function launchConfetti() {
+    for (let i = 0; i < 40; i++) {
+        const conf = document.createElement("div");
+        conf.classList.add("confetti");
+        conf.style.left = Math.random() * 100 + "vw";
+        conf.style.background = randomColor();
+        conf.style.animationDuration = (2 + Math.random() * 2) + "s";
+        document.body.appendChild(conf);
+
+        setTimeout(() => conf.remove(), 4000);
+    }
+}
+
+function randomColor() {
+    const colors = ["#ff00ff", "#00ffff", "#ffea00", "#ff5500", "#00ff55"];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+</script>
+
+</body>
+</html>
