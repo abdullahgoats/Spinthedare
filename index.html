@@ -1,3 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ultimate Challenge Machine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ===== GLOBAL NEON STYLE (R2: Red + Purple Gradient, Cyan Highlights) ===== */
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #2b0015, #3d003d, #5c0040);
+    background-size: 300% 300%;
+    animation: bgMove 10s infinite alternate;
+    font-family: 'Segoe UI', sans-serif;
+    overflow: hidden;
+    color: white;
+}
+
+@keyframes bgMove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+.container {
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+    animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.title {
+    font-size: 2.8rem;
+    margin-bottom: 20px;
+    text-shadow: 0 0 25px #ff003c, 0 0 40px #ff003c;
+    font-weight: bold;
+}
+
+/* ===== MAIN BOX ===== */
+.box {
+    height: 150px;
+    background: rgba(60, 0, 20, 0.4);
+    border: 4px solid #ff003c;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.9rem;
+    margin-bottom: 30px;
+    overflow: hidden;
+    padding: 20px;
+    text-align: center;
+    transition: 0.3s;
+    box-shadow:
+        0 0 25px #ff003c,
+        0 0 50px #7a00ff inset;
+}
+
+/* ===== ROLLING ANIMATION ===== */
+.rolling {
+    animation: roll 0.1s linear infinite;
+}
+
+@keyframes roll {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-25px); }
+}
+
+/* ===== BUTTON ===== */
+.btn {
+    padding: 18px 50px;
+    font-size: 1.7rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #fff;
+    background: linear-gradient(45deg, #ff003c, #7a00ff);
+    box-shadow: 0 0 30px #ff003c, 0 0 60px #7a00ff;
+    transition: 0.2s;
+    font-weight: bold;
+}
+
+.btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 50px #ff003c, 0 0 80px #7a00ff;
+}
+
+/* ===== CONFETTI ===== */
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: red;
+    top: -10px;
+    animation: fall 3s linear forwards;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+@keyframes fall {
+    0% { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(120vh) rotate(720deg); }
+}
+
+/* ===== FULL-SCREEN EDITOR ===== */
+.editor-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    padding: 20px;
+    backdrop-filter: blur(10px) brightness(1.4);
+}
+
+.editor-box {
+    width: 100%;
+    max-width: 700px;
+    background: rgba(40, 0, 20, 0.95);
+    border-radius: 18px;
+    border: 3px solid #ff003c;
+    box-shadow:
+        0 0 25px #ff003c,
+        0 0 60px #7a00ff,
+        inset 0 0 20px rgba(0,255,255,0.4);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.editor-title {
+    font-size: 2rem;
+    text-align: center;
+    color: #00eaff;
+    text-shadow: 0 0 20px #00eaff;
+}
+
+.editor-hint {
+    font-size: 1rem;
+    opacity: 0.9;
+    text-align: center;
+    color: #ffb3c6;
+}
+
+.editor-textarea {
+    width: 100%;
+    min-height: 260px;
+    resize: vertical;
+    border-radius: 12px;
+    border: 2px solid #ff003c;
+    background: rgba(0, 0, 0, 0.85);
+    color: #00eaff;
+    padding: 12px;
+    font-size: 1rem;
+    font-family: monospace;
+    box-shadow: 0 0 20px #7a00ff;
+}
+
+.editor-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.editor-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: 0.2s;
+}
+
+.editor-save {
+    background: linear-gradient(45deg, #ff003c, #7a00ff);
+    color: #fff;
+    box-shadow: 0 0 20px #ff003c;
+}
+
+.editor-save:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 35px #ff003c;
+}
+
+.editor-cancel {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid #ff003c;
+}
+
+.editor-cancel:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px #ff003c;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="title">🔥 ULTIMATE CHALLENGE MACHINE 🔥</div>
+
+    <div id="challengeBox" class="box">Press ROLL to start!</div>
+
+    <button id="rollButton" class="btn">ROLL!</button>
+</div>
+
+<!-- Full-screen editor -->
+<div id="editorOverlay" class="editor-overlay">
+    <div class="editor-box">
+        <div class="editor-title">Edit Challenges</div>
+        <div class="editor-hint">One challenge per line. Long-press ROLL (2 seconds) to open this editor.</div>
+        <textarea id="editorTextarea" class="editor-textarea"></textarea>
+        <div class="editor-buttons">
+            <button class="editor-btn editor-cancel" id="editorCancel">Cancel</button>
+            <button class="editor-btn editor-save" id="editorSave">Save</button>
+        </div>
+    </div>
+</div>
+
+<script>
+/* ===== FUNNY CHALLENGES ===== */
 let challenges = [
     "Act like a chicken for 10 seconds",
     "Talk like a robot malfunctioning",
@@ -28,14 +266,148 @@ let challenges = [
     "Act like you're holding a very heavy invisible box",
     "Say the alphabet like you're terrified",
     "Pretend you're a DJ mixing music with your hands",
-    "Talk like you're underwater",
-    "Pretend you're a robot being controlled by a remote",
-    "Try to touch your elbow with your tongue",
-    "Say everything in a whisper for 20 seconds",
-    "Pretend you're in a dramatic movie scene",
-    "Walk like you're stuck in slow motion",
-    "Act like you're trying to catch a fly",
-    "Pretend you're a superhero with a useless power",
-    "Try to high-five the air dramatically",
-    "Pretend you're a confused tourist"
+    "Pretend you're a robot being controlled by a remote"
 ];
+
+let rollingInterval;
+let rollSpeed = 40;
+let rollTime = 3000; // 3 seconds
+
+const box = document.getElementById("challengeBox");
+const rollButton = document.getElementById("rollButton");
+
+const rollSound = new Audio("roll.ogg");
+rollSound.loop = true;
+rollSound.volume = 0.5;
+
+/* ===== REAL SLOT MACHINE ACCELERATION + DECELERATION ===== */
+function startRolling() {
+    if (rollingInterval) return;
+
+    box.classList.add("rolling");
+
+    rollSound.currentTime = 0;
+    rollSound.play();
+
+    rollSpeed = 40;
+
+    rollingInterval = setInterval(() => {
+        box.textContent = challenges[Math.floor(Math.random() * challenges.length)];
+    }, rollSpeed);
+
+    // ACCELERATE
+    setTimeout(() => rollSpeed = 30, 200);
+    setTimeout(() => rollSpeed = 20, 400);
+
+    // FULL SPEED
+    setTimeout(() => rollSpeed = 15, 800);
+
+    // DECELERATE
+    setTimeout(() => rollSpeed = 30, 2000);
+    setTimeout(() => rollSpeed = 50, 2500);
+
+    setTimeout(stopRolling, rollTime);
+}
+
+function stopRolling() {
+    if (!rollingInterval) return;
+
+    clearInterval(rollingInterval);
+    rollingInterval = null;
+
+    box.classList.remove("rolling");
+
+    rollSound.pause();
+    rollSound.currentTime = 0;
+
+    const finalChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+    box.textContent = finalChallenge;
+
+    launchConfetti();
+}
+
+/* ===== CONFETTI ===== */
+function launchConfetti() {
+    for (let i = 0; i < 40; i++) {
+        const conf = document.createElement("div");
+        conf.classList.add("confetti");
+        conf.style.left = Math.random() * 100 + "vw";
+        conf.style.background = randomColor();
+        conf.style.animationDuration = (2 + Math.random() * 2) + "s";
+        document.body.appendChild(conf);
+
+        setTimeout(() => conf.remove(), 4000);
+    }
+}
+
+function randomColor() {
+    const colors = ["#ff003c", "#7a00ff", "#00eaff"];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+/* ===== LONG PRESS EDITOR ===== */
+let pressTimer = null;
+let longPressTriggered = false;
+
+function startPressTimer() {
+    longPressTriggered = false;
+    pressTimer = setTimeout(() => {
+        longPressTriggered = true;
+        openEditor();
+    }, 2000);
+}
+
+function clearPressTimer() {
+    clearTimeout(pressTimer);
+}
+
+rollButton.addEventListener("mousedown", startPressTimer);
+rollButton.addEventListener("touchstart", startPressTimer, { passive: false });
+
+rollButton.addEventListener("mouseup", () => {
+    clearPressTimer();
+    if (!longPressTriggered) startRolling();
+});
+
+rollButton.addEventListener("mouseleave", clearPressTimer);
+rollButton.addEventListener("touchend", () => {
+    clearPressTimer();
+    if (!longPressTriggered) startRolling();
+});
+
+/* ===== EDITOR LOGIC ===== */
+const editorOverlay = document.getElementById("editorOverlay");
+const editorTextarea = document.getElementById("editorTextarea");
+const editorSave = document.getElementById("editorSave");
+const editorCancel = document.getElementById("editorCancel");
+
+function openEditor() {
+    editorTextarea.value = challenges.join("\n");
+    editorOverlay.style.display = "flex";
+}
+
+function closeEditor() {
+    editorOverlay.style.display = "none";
+}
+
+editorSave.addEventListener("click", () => {
+    const lines = editorTextarea.value
+        .split("\n")
+        .map(l => l.trim())
+        .filter(l => l.length > 0);
+
+    if (lines.length > 0) {
+        challenges = lines;
+    }
+    closeEditor();
+});
+
+editorCancel.addEventListener("click", closeEditor);
+
+editorOverlay.addEventListener("click", (e) => {
+    if (e.target === editorOverlay) closeEditor();
+});
+</script>
+
+</body>
+</html>
